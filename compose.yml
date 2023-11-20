@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+
+  db:
+    container_name: home_assignment_db
+    image: postgres:16.0
+    restart: always
+    environment:
+      POSTGRES_DB: "${DB_NAME}"
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      TZ: "${DB_TIME_ZONE}"
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - ./database/docker/init_data.sql:/docker-entrypoint-initdb.d/init_data.sql
+
+  api:
+    container_name: home_assignment_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "${API_PORT}:8080"
+    volumes:
+      - "./.env:/.env"
+    depends_on:
+      - db
